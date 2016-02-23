@@ -154,10 +154,10 @@ public class SWMConnection{
 	ar_vec[2][0] = r2.getDouble(0);
 	ar_vec[2][1] = r2.getDouble(1);
 	ar_vec[2][2] = r2.getDouble(2);
-	//System.out.println(r1.getDouble(0));
+	System.out.println(r0.getDouble(0)+"   "+r0.getDouble(1)+"   "+"    "+r0.getDouble(2)+"    "+"         "+r1.getDouble(0)+"        "+"         "+r1.getDouble(1)+"     "+"      "+r1.getDouble(2)+"      "+"             "+r2.getDouble(0)+"         " +r2.getDouble(1)+"       "+"       "+r2.getDouble(2));
 	double[] ant = MatrixToQuat(ar_vec);
 	String pose_arr = "[["+r0.getDouble(3)+","+r1.getDouble(3)+","+r2.getDouble(3)+","+r3.getDouble(3)+"]"+
-	    "["+ant[0]+","+ant[1]+","+ant[2]+","+r3.getDouble(3)+"]]";
+	    "["+ant[1]+","+ant[2]+","+ant[3]+","+r3.getDouble(3)+"]]";
 
 	ZMQ.close(sc);
 	ZMQ.term(ctx);
@@ -380,9 +380,9 @@ public class SWMConnection{
 	ar_vec[2][0] = r2.getDouble(0);
 	ar_vec[2][1] = r2.getDouble(1);
 	ar_vec[2][2] = r2.getDouble(2);
-	double[] ant = MatrixToQuaternion(ar_vec);
+	double[] ant = MatrixToQuat(ar_vec);
 	String pose_arr = "[["+r0.getDouble(3)+","+r1.getDouble(3)+","+r2.getDouble(3)+","+r3.getDouble(3)+"]"+
-	    "["+ant[0]+","+ant[1]+","+ant[2]+","+r3.getDouble(3)+"]]";
+	    "["+ant[1]+","+ant[2]+","+ant[3]+","+r3.getDouble(3)+"]]";
 	ZMQ.close(sc);
 	ZMQ.term(ctx);
 	return pose_arr;
