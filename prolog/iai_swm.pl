@@ -31,12 +31,12 @@
 */
 
 :- module(iai_swm,
-    [
-      swm_interface/0,
-      swm_interface/1,
-      swm_test/2,
-      swm_transform/2
-  ]).
+  [
+   swm_interface/0,
+   swm_interface/1,
+   swm_AgentsData/2,
+   swm_EntitiesData/1
+ ]).
 
 :- use_module(library('semweb/rdf_db')).
 :- use_module(library('semweb/rdfs')).
@@ -47,8 +47,9 @@
 :- use_module(library('jpl')).
 
 :- rdf_meta swm_test(r,r),
-    swm_transform(r,r),
-    swm_interface(r).
+    swm_interface(r),
+    swm_AgentsData(r,r),
+    swm_EntitiesData(r).
 
 :- rdf_db:rdf_register_ns(knowrob, 'http://knowrob.org/kb/knowrob.owl#', [keep(true)]).
 
@@ -60,16 +61,15 @@ swm_interface(SWM) :-
     jpl_new('com.github.iai_swm.SWMConnection', [], SWM),
     retract(swm_inter(fail)),
     assert(swm_inter(SWM)),!.
+    
 swm_interface(DB) :-
     swm_inter(DB). 
+    
+swm_AgentsData(Ant, Bnt):-
+    swm_interface(SWM),
+    format("AgentsData"),
+    jpl_call(SWM, 'queryAgentsData',[Ant],Bnt).
 
-swm_test(Ant, Bnt) :-
-    format('FIRST'),
+swm_EntitiesData(Ant):-
     swm_interface(SWM),
-    format('second'),
-    jpl_call(SWM, 'testString',[Ant], Bnt).
-  
-swm_transform(Ant, Bnt) :-
-    format('transform'),
-    swm_interface(SWM),
-    jpl_call(SWM, 'queryTransform',[Ant], Bnt).
+    jpl_call(SWM, 'queryEntitiesData',[],Ant).

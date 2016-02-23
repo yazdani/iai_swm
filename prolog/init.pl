@@ -31,6 +31,7 @@
 
 :- register_ros_package(knowrob_common).
 :- register_ros_package(iai_swm).
+:- register_ros_package(knowrob_map_data).
 :- register_ros_package(knowrob_objects).
 
 :- use_module(library('iai_swm')).
