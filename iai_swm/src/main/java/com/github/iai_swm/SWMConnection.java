@@ -155,9 +155,14 @@ public class SWMConnection{
 	ar_vec[2][1] = r2.getDouble(1);
 	ar_vec[2][2] = r2.getDouble(2);
 	System.out.println(r0.getDouble(0)+"   "+r0.getDouble(1)+"   "+"    "+r0.getDouble(2)+"    "+"         "+r1.getDouble(0)+"        "+"         "+r1.getDouble(1)+"     "+"      "+r1.getDouble(2)+"      "+"             "+r2.getDouble(0)+"         " +r2.getDouble(1)+"       "+"       "+r2.getDouble(2));
-	double[] ant = MatrixToQuat(ar_vec);
+
+
+
+	double[] ant = MatrixToQuatExp(ar_vec);
+
+	System.out.println(ant[0] + " und "+ant[1]+ " und " +ant[2]+ " und "+ant[3]);
 	String pose_arr = "[["+r0.getDouble(3)+","+r1.getDouble(3)+","+r2.getDouble(3)+","+r3.getDouble(3)+"]"+
-	    "["+ant[1]+","+ant[2]+","+ant[3]+","+r3.getDouble(3)+"]]";
+	    "["+ant[0]+","+(ant[1] * -1)+","+(ant[2] * -1)+","+ant[3]+"]]";
 
 	ZMQ.close(sc);
 	ZMQ.term(ctx);
@@ -374,15 +379,16 @@ public class SWMConnection{
 	ar_vec[0][0] = r0.getDouble(0);
 	ar_vec[0][1] = r0.getDouble(1);
 	ar_vec[0][2] = r0.getDouble(2);
-	ar_vec[1][0] = r1.getDouble(0);
-	ar_vec[1][1] = r1.getDouble(1);
-	ar_vec[1][2] = r1.getDouble(2);
-	ar_vec[2][0] = r2.getDouble(0);
-	ar_vec[2][1] = r2.getDouble(1);
-	ar_vec[2][2] = r2.getDouble(2);
-	double[] ant = MatrixToQuat(ar_vec);
+	ar_vec[1][0] = r1.getDouble(0) * -1;
+	ar_vec[1][1] = r1.getDouble(1) * -1;
+	ar_vec[1][2] = r1.getDouble(2) * -1;
+	ar_vec[2][0] = r2.getDouble(0) * -1;
+	ar_vec[2][1] = r2.getDouble(1) * -1;
+	ar_vec[2][2] = r2.getDouble(2) * -1;
+	double[] ant = MatrixToQuatExp(ar_vec);
 	String pose_arr = "[["+r0.getDouble(3)+","+r1.getDouble(3)+","+r2.getDouble(3)+","+r3.getDouble(3)+"]"+
-	    "["+ant[1]+","+ant[2]+","+ant[3]+","+r3.getDouble(3)+"]]";
+	    "["+ant[0]+","+(ant[1] * -1)+","+(ant[2] * -1)+","+ant[3]+"]]";	   
+
 	ZMQ.close(sc);
 	ZMQ.term(ctx);
 	return pose_arr;
@@ -650,32 +656,74 @@ public class SWMConnection{
     }
 
 
-  public double[] internal_normalize (double x, double y, double z, double w)
-    {
-	double tmp = (x * x) + (y * y) + (z* z) + (w * w);
-	double Quat[] = new double[4];
-	Quat[0] = x / tmp;
-	Quat[1] = y / tmp;
-	Quat[2] = z / tmp;
-	Quat[3] = w / tmp;
-	return Quat;
-    }
+    // public double[] MatrixToQuat(double[][] Rot)
+    // {
 
-    public double[] MatrixToQuat(double[][] Rot)
+    // 	double epsilon = 0.000001;
+    // 	double[] Quat = new double[4];
+
+    // 	double tr = Rot[0][0]+ Rot[1][1]+ Rot[2][2] + 1.0;
+
+    // 	if (tr > epsilon)
+    // 	    {
+    // 	    double s = java.lang.Math.sqrt(tr) / 0.5;
+    // 	    Quat[0] = (Rot[2][1] - Rot[1][2]) * s;
+    // 	    Quat[1] = (Rot[0][2] - Rot[2][0]) * s;
+    // 	    Quat[2] = (Rot[1][0] - Rot[0][1]) * s;
+    // 	    Quat[3] = 0.25 / s;
+    // 	    }else
+
+    // 	if(Rot[0][0] > Rot[1][1] && Rot[0][0] > Rot[2][2])
+    // 	    {
+    // 		double s = 2.0 * java.lang.Math.sqrt((Rot[1][1] * -1) + (Rot[2][2] * -1) + 1.0 + Rot[0][0]);
+    // 		Quat[0] = 0.25 * s;
+    // 		Quat[1] = (Rot[0][1] + Rot[1][0]) / s;
+    // 		Quat[2] = (Rot[0][2] + Rot[2][0]) / s;
+    // 		Quat[3] = (Rot[2][1] - Rot[1][2]) / s;
+    // 	    }else
+    // 	    if(Rot[1][1] > Rot[2][2])
+    // 		{
+		    
+    // 		double s = 2.0 * java.lang.Math.sqrt(Rot[1][1]  + (Rot[0][0] * -1) + (Rot[2][2] * -1));
+    // 		Quat[1] = 0.25 * s;
+    // 		Quat[0] = (Rot[0][1] + Rot[1][0]) / s;
+    // 		Quat[2] = (Rot[1][2] + Rot[2][1]) / s;
+    // 		Quat[3] = (Rot[0][2] - Rot[2][0]) / s;
+    // 		}else
+    // 		{
+    // 		double Quat1[] = new double[4];
+	
+    // 		double s = 2.0 * java.lang.Math.sqrt(1.0 + Rot[2][2]  + (Rot[0][0] * -1) + (Rot[1][1] * -1));
+    // 		Quat1[2] = 0.25 * s;
+    // 		Quat1[0] = (Rot[0][2] + Rot[2][0]) / s;
+    // 		Quat1[1] = (Rot[1][2] + Rot[2][1]) / s;
+    // 		Quat1[3] = (Rot[1][0] - Rot[0][1]) / s;
+		
+    // 		Quat = internal_normalize(Quat1[0], Quat1[1], Quat1[2], Quat1[3]);
+    // 		}
+
+	   
+
+    // 	return Quat;
+
+    // }
+
+
+public double[] MatrixToQuatExp(double[][] Rot)
     {
 
 	double epsilon = 0.000001;
 	double[] Quat = new double[4];
 
-	double tr = Rot[0][0]+ Rot[1][1]+ Rot[2][2] + 1.0;
+	double tr = Rot[0][0]+ Rot[1][1]+ Rot[2][2];
 
 	if (tr > epsilon)
 	    {
-	    double s = java.lang.Math.sqrt(tr) / 0.5;
-	    Quat[0] = (Rot[2][1] - Rot[1][2]) * s;
-	    Quat[1] = (Rot[0][2] - Rot[2][0]) * s;
-	    Quat[2] = (Rot[1][0] - Rot[0][1]) * s;
-	    Quat[3] = 0.25 / s;
+	    double s = java.lang.Math.sqrt(tr+1.0) * 2;
+	    Quat[0] = (Rot[2][1] - Rot[1][2]) / s;
+	    Quat[1] = (Rot[0][2] - Rot[2][0]) / s;
+	    Quat[2] = (Rot[1][0] - Rot[0][1]) / s;
+	    Quat[3] = 0.25 * s;
 	    }else
 
 	if(Rot[0][0] > Rot[1][1] && Rot[0][0] > Rot[2][2])
@@ -689,22 +737,18 @@ public class SWMConnection{
 	    if(Rot[1][1] > Rot[2][2])
 		{
 		    
-		double s = 2.0 * java.lang.Math.sqrt(Rot[1][1]  + (Rot[0][0] * -1) + (Rot[2][2] * -1));
+		double s = 2.0 * java.lang.Math.sqrt(1.0 + Rot[1][1]  + (Rot[0][0] * -1) + (Rot[2][2] * -1));
 		Quat[1] = 0.25 * s;
 		Quat[0] = (Rot[0][1] + Rot[1][0]) / s;
 		Quat[2] = (Rot[1][2] + Rot[2][1]) / s;
 		Quat[3] = (Rot[0][2] - Rot[2][0]) / s;
 		}else
 		{
-		double Quat1[] = new double[4];
-	
 		double s = 2.0 * java.lang.Math.sqrt(1.0 + Rot[2][2]  + (Rot[0][0] * -1) + (Rot[1][1] * -1));
-		Quat1[2] = 0.25 * s;
-		Quat1[0] = (Rot[0][2] + Rot[2][0]) / s;
-		Quat1[1] = (Rot[1][2] + Rot[2][1]) / s;
-		Quat1[3] = (Rot[1][0] - Rot[0][1]) / s;
-		
-		Quat = internal_normalize(Quat1[0], Quat1[1], Quat1[2], Quat1[3]);
+		Quat[2] = 0.25 * s;
+		Quat[0] = (Rot[0][2] + Rot[2][0]) / s;
+		Quat[1] = (Rot[1][2] + Rot[2][1]) / s;
+		Quat[3] = (Rot[1][0] - Rot[0][1]) / s;
 		}
 
 	   
@@ -712,7 +756,6 @@ public class SWMConnection{
 	return Quat;
 
     }
-
 
   
 
