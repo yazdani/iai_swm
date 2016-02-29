@@ -187,25 +187,37 @@ public class SWMConnection{
 	String environment= "";
 	for(int i =0; i < array.length; i++)
 	    {
-
-		if(containsMountain(array[i][1]))
-		   {
-		       String tmp = getTheMountainList(array[i][0],array[i][1]);
-		       mount=mount+tmp;
-		   }else
-		    if(containsEnvironment(array[i][1]))
+		  if(containsEnvironment(array[i][1]))
 			{
 			    String tmp = getTheEnvironmentList(array[i][0]);
 			    environment = environment+tmp;
 			}
 	    }
-	return "("+mount+environment+")";
+	return "("+environment+")";
 	
     }
 
    public static boolean containsMountain( String text )
     {
 	return text.contains("mount");// || text.contains("center") 
+	// || text.contains("bbox01") || text.contains("bbox02");
+    }
+
+   public static boolean containsRiver( String text )
+    {
+	return text.contains("river");// || text.contains("center") 
+	// || text.contains("bbox01") || text.contains("bbox02");
+    }
+
+   public static boolean containsWood( String text )
+    {
+	return text.contains("wood");// || text.contains("center") 
+	// || text.contains("bbox01") || text.contains("bbox02");
+    }
+
+   public static boolean containsHouse( String text )
+    {
+	return text.contains("house");// || text.contains("center") 
 	// || text.contains("bbox01") || text.contains("bbox02");
     }
 
@@ -216,16 +228,195 @@ public class SWMConnection{
     }
 
     public String getTheMountainList(String array1, String array2)
-    {
+    { //array1 -> reference_id and array2 -> name
+	System.out.println("get The Mountain List");
+	Vector<String> childNds = new Vector<String>(1);
 	String name_vector= array2;
-	String type_vector= getTheType(array1);
-	String center_vector= getTheCenterTransform(array1);
-     	String bbox1_vector=getTheMinBBox(array1);
-	String bbox2_vector=getTheMaxBBox(array1);
-	String str = "("+name_vector+","+type_vector+","+center_vector+","+bbox1_vector+","+bbox2_vector+")";
-	return str;
+	String type_vector = getTheType(array1);
+	childNds = getChildNodes(array1);
+	String[][] vec = new String[childNds.size()][2];
+	vec = getTheChildrens(getChildNodes(array1));
+	String combiner = "";
+	int name = 0;
+	int initializer = 0;
+	for(int i = 0; i < vec.length; i++)
+	    {
+		if(containBoundingBox(vec[i][1]))
+		    {
+			Vector<String> tester = new Vector<String>(1);
+			tester = getChildNodes(vec[i][0]);
+			String[][] vec2 = new String[tester.size()][2];
+			vec2 = getTheChildrens(tester);
+			for(int in = 0; in < tester.size(); in++)
+			    {
+				name = in + 1;
+				String center_vector= getTheCenterTransform(vec2[in][0]);
+				String bbox1_vector=getTheMinBBox(vec2[in][0]);
+				String bbox2_vector=getTheMaxBBox(vec2[in][0]);
+				combiner = combiner+ "("+"mountain_part"+name+","+type_vector+","+center_vector+","+bbox1_vector+","+bbox2_vector+")";		
+			    }
+		    }else if(initializer == 0)
+		    {
+			System.out.println("no bounding nox");
+
+			//	String name_vector= array2;
+			//	String type_vector= getTheType(vec[i][0]);
+			String center_vector= getTheCenterTransform(array1);
+			String bbox1_vector=getTheMinBBox(array1);
+			String bbox2_vector=getTheMaxBBox(array1);
+			combiner = combiner+ "("+name_vector+","+type_vector+","+center_vector+","+bbox1_vector+","+bbox2_vector+")";
+			initializer = 1;
+		    }  
+	    }
+	return combiner;
     }
     
+    public String getTheWoodList(String array1, String array2)
+    { //array1 -> reference_id and array2 -> name
+	System.out.println("get The Wood List");
+	Vector<String> childNds = new Vector<String>(1);
+	String name_vector= array2;
+	String type_vector = getTheType(array1);
+	childNds = getChildNodes(array1);
+	String[][] vec = new String[childNds.size()][2];
+	vec = getTheChildrens(getChildNodes(array1));
+	String combiner = "";
+	int name = 0;
+	int initializer = 0;
+	for(int i = 0; i < vec.length; i++)
+	    {
+		if(containBoundingBox(vec[i][1]))
+		    {
+			Vector<String> tester = new Vector<String>(1);
+			tester = getChildNodes(vec[i][0]);
+			String[][] vec2 = new String[tester.size()][2];
+			vec2 = getTheChildrens(tester);
+			for(int in = 0; in < tester.size(); in++)
+			    {
+				name = in + 1;
+				String center_vector= getTheCenterTransform(vec2[in][0]);
+				String bbox1_vector=getTheMinBBox(vec2[in][0]);
+				String bbox2_vector=getTheMaxBBox(vec2[in][0]);
+				combiner = combiner+ "("+"wood_part"+name+","+type_vector+","+center_vector+","+bbox1_vector+","+bbox2_vector+")";		
+			    }
+		    }else if(initializer == 0)
+		    {
+			System.out.println("no bounding box");
+
+			//	String name_vector= array2;
+			//	String type_vector= getTheType(vec[i][0]);
+			String center_vector= getTheCenterTransform(array1);
+			String bbox1_vector=getTheMinBBox(array1);
+			String bbox2_vector=getTheMaxBBox(array1);
+			combiner = combiner+ "("+name_vector+","+type_vector+","+center_vector+","+bbox1_vector+","+bbox2_vector+")";
+			initializer = 1;
+		    }  
+	    }
+	System.out.println("combiner is "+combiner);
+	return combiner;
+    }
+
+    public String getTheRiverList(String array1, String array2)
+    { //array1 -> reference_id and array2 -> name
+	System.out.println("Get the river list");
+	Vector<String> childNds = new Vector<String>(1);
+	String name_vector= array2;
+	String type_vector = getTheType(array1);
+	childNds = getChildNodes(array1);
+	String[][] vec = new String[childNds.size()][2];
+	vec = getTheChildrens(getChildNodes(array1));
+	String combiner = "";
+	int name = 0;
+	int initializer = 0;
+	String center_vector= "";
+	String bbox1_vector= "";
+	String bbox2_vector= "";
+	for(int i = 0; i < vec.length; i++)
+	    {
+		if(containBoundingBox(vec[i][1]))
+		    {
+			System.out.println(vec.length);
+			System.out.println("VECTOR "+vec[i][0]);
+			System.out.println("with bounding box inside river");
+			Vector<String> tester = new Vector<String>(1);
+			tester = getChildNodes(vec[i][0]);
+			System.out.println("tester'"+tester);
+			String[][] vec2 = new String[tester.size()][2];
+			vec2 = getTheChildrens(tester);
+			for(int in = 0; in < tester.size(); in++)
+			    {
+				name = in + 1;
+				if(containBBox1(vec2[in][0]))
+				    bbox1_vector=getTheMinBBox(vec2[in][0]);
+				else if(containBBox2(vec2[in][0]))
+				    bbox2_vector=getTheMaxBBox(vec2[in][0]);
+				else if(containCenter(vec2[in][0]))
+				    center_vector=getTheCenterTransform(vec2[in][0]);
+				System.out.println(vec2[in][0]);
+				System.out.println(vec2[in][1]);
+						   //			combiner = combiner+ "("+"river_part"+name+","+type_vector+","+center_vector+","+bbox1_vector+","+bbox2_vector+")";		
+			    }
+			combiner = combiner+ "("+"river_part"+name+","+type_vector+","+center_vector+","+bbox1_vector+","+bbox2_vector+")";		
+		    }else if(initializer == 0)
+		    {
+			System.out.println("withOUT bounding box");
+			//	String name_vector= array2;
+			System.out.println(type_vector);
+			//	String type_vector= getTheType(vec[i][0]);
+			center_vector= getTheCenterTransform(array1);
+			bbox1_vector=getTheMinBBox(array1);
+			bbox2_vector=getTheMaxBBox(array1);
+			combiner = combiner+ "("+name_vector+","+type_vector+","+center_vector+","+bbox1_vector+","+bbox2_vector+")";
+			initializer = 1;
+			
+		    }  
+	    }
+	return combiner;
+    }
+
+    public String getTheHouseList(String array1, String array2)
+    { //array1 -> reference_id and array2 -> name
+	Vector<String> childNds = new Vector<String>(1);
+	String name_vector= array2;
+	String type_vector = getTheType(array1);
+	childNds = getChildNodes(array1);
+	String[][] vec = new String[childNds.size()][2];
+	vec = getTheChildrens(getChildNodes(array1));
+	String combiner = "";
+	int name = 0;
+	int initializer = 0;
+	
+	for(int i = 0; i < vec.length; i++)
+	    {
+		if(containBoundingBox(vec[i][1]))
+		    {
+			Vector<String> tester = new Vector<String>(1);
+			tester = getChildNodes(vec[i][0]);
+			String[][] vec2 = new String[tester.size()][2];
+			vec2 = getTheChildrens(tester);
+			for(int in = 0; in < tester.size(); in++)
+			    {
+				name = in + 1;
+				String center_vector= getTheCenterTransform(vec2[in][0]);
+				String bbox1_vector=getTheMinBBox(vec2[in][0]);
+				String bbox2_vector=getTheMaxBBox(vec2[in][0]);
+				combiner = combiner+ "("+"house_part"+name+",house,"+center_vector+","+bbox1_vector+","+bbox2_vector+")";		
+			    }
+		    }else if(initializer == 0)
+		    {
+			System.out.println("without boundingqqw box");
+
+			//	String name_vector= array2;
+			String center_vector= getTheCenterTransform(array1);
+			String bbox1_vector=getTheMinBBox(array1);
+			String bbox2_vector=getTheMaxBBox(array1);
+			combiner = combiner+ "("+name_vector+","+type_vector+","+center_vector+","+bbox1_vector+","+bbox2_vector+")";
+			initializer = 1;
+		    }  
+	    }
+	return combiner;
+    }
+
  public String getTheCenterTransform(String id)
     {
 	//System.out.println("--->:");
@@ -336,6 +527,12 @@ public class SWMConnection{
 	return(word.contains("bbox01"));
     }
 
+    public boolean containBoundingBox(String word)
+    {
+
+	return(word.contains("bounding_box"));
+    }
+
     public boolean containBBox2(String word)
     {
 
@@ -345,7 +542,7 @@ public class SWMConnection{
     public boolean containCenter(String word)
     {
 
-	return(word.contains("center"));
+	return(word.contains("center") || word.contains("centre"));
     }
     
     public String getTheTransform(String id)
@@ -749,9 +946,7 @@ public double[] MatrixToQuatExp(double[][] Rot)
 		Quat[0] = (Rot[0][2] + Rot[2][0]) / s;
 		Quat[1] = (Rot[1][2] + Rot[2][1]) / s;
 		Quat[3] = (Rot[1][0] - Rot[0][1]) / s;
-		}
-
-	   
+		}  
 
 	return Quat;
 
@@ -762,19 +957,39 @@ public double[] MatrixToQuatExp(double[][] Rot)
     public String getTheEnvironmentList(String array1)
     {
 	String[][] array =getTheChildrens(getChildNodes(array1));
-	String mount = "";
-	String environment= "";
+	String mount="";
+	String river="";
+	String house="";
+	String wood="";
+	
 	for(int i =0; i < array.length; i++)
 	    {
-		String name_vector= array[i][1];
-		String type_vector= getTheType(array[i][0]);
-		String center_vector= getTheCenterTransform(array[i][0]);
-		String bbox1_vector=getTheMinBBox(array[i][0]);
-		String bbox2_vector=getTheMaxBBox(array[i][0]);
-		environment = environment+ "("+name_vector+","+type_vector+","+center_vector+","+bbox1_vector+","+bbox2_vector+")";
-			
+		System.out.println("test "+array[i][1]);
+		if(containsMountain(array[i][1]))
+		    {
+			String tmp = getTheMountainList(array[i][0],array[i][1]);
+			mount=mount+tmp;
+		    }else
+		    if(containsRiver(array[i][1]))
+			{
+			    String tmp = getTheRiverList(array[i][0],array[i][1]);
+			    river=river+tmp;
+			}else
+			if(containsHouse(array[i][1]))
+			    {
+				String tmp = getTheHouseList(array[i][0],array[i][1]);
+				house=house+tmp;
+			    }else
+		    if(containsWood(array[i][1]))
+			{
+			    String tmp = getTheWoodList(array[i][0],array[i][1]);
+			    wood=wood+tmp;
+			    System.out.println("wood :"+wood);
+			}
 	    }
-	return environment;
+
+	return "("+mount+river+house+wood+")";
+
     }
 	
     public SWMConnection() {
