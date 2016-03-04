@@ -197,34 +197,42 @@ public class SWMConnection{
 	
     }
 
-   public static boolean containsMountain( String text )
+    public String getTheEnvironmentList(String array1)
     {
-	return text.contains("mount");// || text.contains("center") 
-	// || text.contains("bbox01") || text.contains("bbox02");
-    }
+	String[][] array =getTheChildrens(getChildNodes(array1));
+	String mount="";
+	String river="";
+	String house="";
+	String wood="";
+	
+	for(int i =0; i < array.length; i++)
+	    {
+		System.out.println("test "+array[i][1]);
+		// if(containsMountain(array[i][1]))
+		//     {
+		// 	String tmp = getTheMountainList(array[i][0],array[i][1]);
+		// 	mount=mount+tmp;
+		//     }else
+		    if(containsRiver(array[i][1]))
+			{
+			    String tmp = getTheRiverList(array[i][0],array[i][1]);
+			    river=river+tmp;
+			}// else
+		    // 	if(containsHouse(array[i][1]))
+		    // 	    {
+		    // 		String tmp = getTheHouseList(array[i][0],array[i][1]);
+		    // 		house=house+tmp;
+		    // 	    }else
+		    // if(containsWood(array[i][1]))
+		    // 	{
+		    // 	    String tmp = getTheWoodList(array[i][0],array[i][1]);
+		    // 	    wood=wood+tmp;
+		    // 	    System.out.println("wood :"+wood);
+		    // 	}
+	    }
 
-   public static boolean containsRiver( String text )
-    {
-	return text.contains("river");// || text.contains("center") 
-	// || text.contains("bbox01") || text.contains("bbox02");
-    }
+	return "("+mount+river+house+wood+")";
 
-   public static boolean containsWood( String text )
-    {
-	return text.contains("wood");// || text.contains("center") 
-	// || text.contains("bbox01") || text.contains("bbox02");
-    }
-
-   public static boolean containsHouse( String text )
-    {
-	return text.contains("house");// || text.contains("center") 
-	// || text.contains("bbox01") || text.contains("bbox02");
-    }
-
-    public static boolean containsEnvironment( String text )
-    {
-	return text.contains("environment");// || text.contains("center") 
-	// || text.contains("bbox01") || text.contains("bbox02");
     }
 
     public String getTheMountainList(String array1, String array2)
@@ -241,7 +249,7 @@ public class SWMConnection{
 	int initializer = 0;
 	for(int i = 0; i < vec.length; i++)
 	    {
-		if(containBoundingBox(vec[i][1]))
+		if(containsBoundingBox(vec[i][1]))
 		    {
 			Vector<String> tester = new Vector<String>(1);
 			tester = getChildNodes(vec[i][0]);
@@ -285,7 +293,7 @@ public class SWMConnection{
 	int initializer = 0;
 	for(int i = 0; i < vec.length; i++)
 	    {
-		if(containBoundingBox(vec[i][1]))
+		if(containsBoundingBox(vec[i][1]))
 		    {
 			Vector<String> tester = new Vector<String>(1);
 			tester = getChildNodes(vec[i][0]);
@@ -317,61 +325,164 @@ public class SWMConnection{
     }
 
     public String getTheRiverList(String array1, String array2)
-    { //array1 -> reference_id and array2 -> name
+    { 
 	System.out.println("Get the river list");
 	Vector<String> childNds = new Vector<String>(1);
 	String name_vector= array2;
-	String type_vector = getTheType(array1);
+	String type_vector = "river"; //instead of infocoming from dcm >>>>@TODO: Bologna<<<< getTheType(array1);
 	childNds = getChildNodes(array1);
 	String[][] vec = new String[childNds.size()][2];
-	vec = getTheChildrens(getChildNodes(array1));
+	vec = getTheChildrens(childNds);
 	String combiner = "";
-	int name = 0;
-	int initializer = 0;
+	//	Vector<String> BBChildNds = new Vector<String>(1);
+	//	String[][] BBVec = new String[BBChildNds.size()][2];
+	String combiner1 = "";
+	String txt = "";
+	int setFlag = 0;
 	String center_vector= "";
 	String bbox1_vector= "";
 	String bbox2_vector= "";
 	for(int i = 0; i < vec.length; i++)
 	    {
-		if(containBoundingBox(vec[i][1]))
+		System.out.println("Go into loop of river list");
+		if(containsBoundingBox(vec[i][1]))
 		    {
-			System.out.println(vec.length);
-			System.out.println("VECTOR "+vec[i][0]);
-			System.out.println("with bounding box inside river");
-			Vector<String> tester = new Vector<String>(1);
-			tester = getChildNodes(vec[i][0]);
-			System.out.println("tester'"+tester);
-			String[][] vec2 = new String[tester.size()][2];
-			vec2 = getTheChildrens(tester);
-			for(int in = 0; in < tester.size(); in++)
-			    {
-				name = in + 1;
-				if(containBBox1(vec2[in][0]))
-				    bbox1_vector=getTheMinBBox(vec2[in][0]);
-				else if(containBBox2(vec2[in][0]))
-				    bbox2_vector=getTheMaxBBox(vec2[in][0]);
-				else if(containCenter(vec2[in][0]))
-				    center_vector=getTheCenterTransform(vec2[in][0]);
-				System.out.println(vec2[in][0]);
-				System.out.println(vec2[in][1]);
-						   //			combiner = combiner+ "("+"river_part"+name+","+type_vector+","+center_vector+","+bbox1_vector+","+bbox2_vector+")";		
-			    }
-			combiner = combiner+ "("+"river_part"+name+","+type_vector+","+center_vector+","+bbox1_vector+","+bbox2_vector+")";		
-		    }else if(initializer == 0)
+			setFlag = 1;
+			//	System.out.println("are you sure there exists a bounding box: "+vec[i][1]);
+			//	System.out.println("First level");
+				System.out.println("BoundingBox: "+vec[i][0]);
+				//	Vector<String> BBChildNds = new Vector<String>(1);
+			//	System.out.println("Go into if next to loop234");
+				//	        BBChildNds = getChildNodes(vec[i][0]);
+			//	System.out.println("Go into if next to loop3");
+			//String[][] BBVec = new String[BBChildNds.size()][2];
+			//	System.out.println("Go into if next to loop4");
+				//	BBVec = getTheChildrens(BBChildNds); 
+			//	System.out.println("TEST: "+BBVec.length);
+				// for(int j = 0; j < BBVec.length; j++)
+				//	{
+				    // System.out.println("BoundingBox: "+BBVec[j][0]);
+				    // System.out.println("BoundingBox: "+vec[i][0]);
+				   txt = recursiveBBoxx(name_vector,type_vector, vec[i][0], txt, 1);
+				   System.out.println("@AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"+txt);
+				    //}
+				   return txt;
+		
+		    }else if(!containsBoundingBox(vec[i][1]) && setFlag == 0)
 		    {
-			System.out.println("withOUT bounding box");
-			//	String name_vector= array2;
-			System.out.println(type_vector);
-			//	String type_vector= getTheType(vec[i][0]);
 			center_vector= getTheCenterTransform(array1);
 			bbox1_vector=getTheMinBBox(array1);
 			bbox2_vector=getTheMaxBBox(array1);
-			combiner = combiner+ "("+name_vector+","+type_vector+","+center_vector+","+bbox1_vector+","+bbox2_vector+")";
-			initializer = 1;
-			
+			combiner = combiner+ "("+name_vector+","+type_vector+","+center_vector+","+bbox1_vector+","+bbox2_vector+")";		
 		    }  
 	    }
-	return combiner;
+	
+	if(setFlag == 0)
+	    {
+		return combiner+txt;
+	    }
+	combiner = "";
+	return txt;
+    }
+
+
+    public String recursiveBBoxx(String objname, String type, String arg1, String txt, int count)
+    {
+	
+	System.out.println("1- BB in recursive");
+	System.out.println("2- "+arg1);
+	Vector<String> childNds = new Vector<String>(1);
+	childNds = getChildNodes(arg1);
+	String[][] vec = new String[childNds.size()][2];
+	vec = getTheChildrens(childNds);
+	String combiner = "";
+	String center_vector= "";
+	String bbox1_vector= "";
+	String bbox2_vector= "";
+	int setFlag = 0;
+	int counter = count;
+	for(int i = 0; i < vec.length; i ++)
+	    {
+		System.out.println("Flag is: " +setFlag);
+		if(containsBoundingBox(vec[i][1]))
+		    {
+			setFlag = 1;
+			System.out.println("BoundingBox: "+vec[i][0]);
+			combiner = recursiveBBoxx(objname, type, vec[i][0], txt, count);
+			//combiner = "";
+			return combiner;  //@TODO
+		
+		    }
+	    }
+
+	System.out.println(vec.length+ " the vector lengtjh");
+
+	if(setFlag == 0 && vec.length != 0)
+	    {
+		for(int i = 0; i < vec.length; i ++)
+		    {
+			if(containsCenter(vec[i][1]))
+			{
+			   
+			     System.out.println(vec[i][0]+ " the vector lengtjh----");
+			     //  System.out.println("center"+getTheCenterTransform(arg1));
+			     // System.out.println("bb1"+getTheMinBBox(arg1));
+			     //System.out.println("bb2"+getTheMaxBBox(arg1));
+			    center_vector= getTheCenterTransform(arg1);
+			    bbox1_vector=getTheMinBBox(arg1);
+			    bbox2_vector=getTheMaxBBox(arg1);
+			    
+			    combiner = combiner+ "("+objname+"_part"+count+","+type+","+center_vector+","+bbox1_vector+","+bbox2_vector+")";	
+			    count = count + 1;
+			    break;
+			}
+	     }
+	    }
+	
+	txt = txt+combiner;
+	    
+	System.out.println("txt is2 "+txt);
+	String  id_pre = getParentID(getParentID(arg1));
+	String id_past = getParentID(arg1);
+	String name = objname;
+        int counterA = count;
+	
+   	System.out.println("4- internalRecursiveBBox");
+	Vector<String> childNdsA = new Vector<String>(1);
+	childNdsA = getChildNodes(id_past);
+	String[][] vecA = new String[childNdsA.size()][2];
+	System.out.println("============================================================");
+	System.out.println(id_past);
+	System.out.println("============================================================");
+	System.out.println(arg1);
+	vecA = getTheChildrens(childNdsA);
+	int index = 0;
+	for(int i = 0; i < vecA.length; i++)
+	    {
+		if(vecA[i][0].equals(arg1))
+		   {
+		       index = i+1;
+		       System.out.println("id_past---: " +id_past);
+		       System.out.println("arg1---: " +arg1);
+		       // System.out.println("BoundingBox: "+vec[i][0]);
+		       //    recursiveBBoxx(name, type, vecA[i+1][0],txt,counterA);
+		     
+		   }else if(!vecA[i][0].equals(arg1))
+		    {
+			//	index = i+1;
+		       System.out.println("id_past: " +id_past);
+		       System.out.println("arg1: " +arg1);
+		       // System.out.println("BoundingBox: "+vec[i][0]);
+		       if( getChildNodes(vecA[i][0]).size() != 0)
+			   {
+			       recursiveBBoxx(name, type, vecA[i][0],txt,counterA);
+			   }
+		    }
+	    }
+
+	System.out.println("UND1: "+txt);
+	return txt;
+
     }
 
     public String getTheHouseList(String array1, String array2)
@@ -388,7 +499,7 @@ public class SWMConnection{
 	
 	for(int i = 0; i < vec.length; i++)
 	    {
-		if(containBoundingBox(vec[i][1]))
+		if(containsBoundingBox(vec[i][1]))
 		    {
 			Vector<String> tester = new Vector<String>(1);
 			tester = getChildNodes(vec[i][0]);
@@ -441,7 +552,7 @@ public class SWMConnection{
 		ZMQ.close(sc);
 		ZMQ.term(ctx);
 		//System.out.println("--->:"+checker);
-		if(containCenter(checker))
+		if(containsCenter(checker))
 		    {
 			trans=getTheTransform(childNds.get(i));
 		    }
@@ -477,7 +588,7 @@ public class SWMConnection{
 		ZMQ.close(sc);
 		ZMQ.term(ctx);
 		//System.out.println("--->:"+checker);
-		if(containBBox1(checker))
+		if(containsBBox1(checker))
 		    {
 			trans=getTheTransform(childNds.get(i));
 		    }
@@ -511,7 +622,7 @@ public class SWMConnection{
 		ZMQ.close(sc);
 		ZMQ.term(ctx);
 		//System.out.println("--->:"+checker);
-		if(containBBox2(checker))
+		if(containsBBox2(checker))
 		    {
 			trans=getTheTransform(childNds.get(i));
 		    }
@@ -521,25 +632,60 @@ public class SWMConnection{
 
     }
 
-    public boolean containBBox1(String word)
-    {
+    //###################################################################
+    //#                  These are the containFunctions                 #
+    //###################################################################
 
-	return(word.contains("bbox01"));
+
+     public static boolean containsMountain( String text )
+    {
+	return text.contains("mount");// || text.contains("center") 
+	// || text.contains("bbox01") || text.contains("bbox02");
     }
 
-    public boolean containBoundingBox(String word)
+   public static boolean containsRiver( String text )
+    {
+	return text.contains("river");// || text.contains("center") 
+	// || text.contains("bbox01") || text.contains("bbox02");
+    }
+
+   public static boolean containsWood( String text )
+    {
+	return text.contains("wood");// || text.contains("center") 
+	// || text.contains("bbox01") || text.contains("bbox02");
+    }
+
+   public static boolean containsHouse( String text )
+    {
+	return text.contains("house");// || text.contains("center") 
+	// || text.contains("bbox01") || text.contains("bbox02");
+    }
+
+    public static boolean containsEnvironment( String text )
+    {
+	return text.contains("environment");// || text.contains("center") 
+	// || text.contains("bbox01") || text.contains("bbox02");
+    }
+
+    public boolean containsBBox1(String word)
+    {
+
+	return(word.contains("bbox01") || word.contains("bbox1"));
+    }
+
+    public boolean containsBoundingBox(String word)
     {
 
 	return(word.contains("bounding_box"));
     }
 
-    public boolean containBBox2(String word)
+    public boolean containsBBox2(String word)
     {
 
-	return(word.contains("bbox02"));
+	return(word.contains("bbox02") || word.contains("bbox2"));
     }
 
-    public boolean containCenter(String word)
+    public boolean containsCenter(String word)
     {
 
 	return(word.contains("center") || word.contains("centre"));
@@ -953,44 +1099,6 @@ public double[] MatrixToQuatExp(double[][] Rot)
     }
 
   
-
-    public String getTheEnvironmentList(String array1)
-    {
-	String[][] array =getTheChildrens(getChildNodes(array1));
-	String mount="";
-	String river="";
-	String house="";
-	String wood="";
-	
-	for(int i =0; i < array.length; i++)
-	    {
-		System.out.println("test "+array[i][1]);
-		if(containsMountain(array[i][1]))
-		    {
-			String tmp = getTheMountainList(array[i][0],array[i][1]);
-			mount=mount+tmp;
-		    }else
-		    if(containsRiver(array[i][1]))
-			{
-			    String tmp = getTheRiverList(array[i][0],array[i][1]);
-			    river=river+tmp;
-			}else
-			if(containsHouse(array[i][1]))
-			    {
-				String tmp = getTheHouseList(array[i][0],array[i][1]);
-				house=house+tmp;
-			    }else
-		    if(containsWood(array[i][1]))
-			{
-			    String tmp = getTheWoodList(array[i][0],array[i][1]);
-			    wood=wood+tmp;
-			    System.out.println("wood :"+wood);
-			}
-	    }
-
-	return "("+mount+river+house+wood+")";
-
-    }
 	
     public SWMConnection() {
 	System.out.println("SWM-Connection is starting");
