@@ -207,7 +207,8 @@ public class SWMConnection{
 	
 	for(int i = 0; i < array.length; i++)
 	    {
-		//	System.out.println("test "+array[i][1]);
+		
+		System.out.println("test "+array[i][1]);
 		if(containsRiver(array[i][1]))
 		    {
 			String tmp = getTheRiverList(array[i][0],array[i][1]);
@@ -625,7 +626,7 @@ public class SWMConnection{
     public boolean containsBBox1(String word)
     {
 
-	return(word.contains("bbox01") || word.contains("bbox1"));
+	return(word.contains("bbox01") || word.contains("bbox1") || world.contains("bbx_river_point_min"));
     }
 
     public boolean containsBoundingBox(String word)
@@ -637,7 +638,7 @@ public class SWMConnection{
     public boolean containsBBox2(String word)
     {
 
-	return(word.contains("bbox02") || word.contains("bbox2"));
+	return(word.contains("bbox02") || word.contains("bbox2") || word.contains("bbx_river_point_max"));
     }
 
     public boolean containsCenter(String word)
@@ -672,27 +673,26 @@ public class SWMConnection{
 	JSONArray r1 =  array.getJSONArray(1);
 	JSONArray r2 =  array.getJSONArray(2);
 	JSONArray r3 =  array.getJSONArray(3);
-	
 	double[][] ar_vec = new double[3][3];
 	ar_vec[0][0] = r0.getDouble(0);
 	ar_vec[0][1] = r0.getDouble(1);
 	ar_vec[0][2] = r0.getDouble(2);
-	ar_vec[1][0] = r1.getDouble(0) * -1;
-	ar_vec[1][1] = r1.getDouble(1) * -1;
-	ar_vec[1][2] = r1.getDouble(2) * -1;
-	ar_vec[2][0] = r2.getDouble(0) * -1;
-	ar_vec[2][1] = r2.getDouble(1) * -1;
-	ar_vec[2][2] = r2.getDouble(2) * -1;
+	ar_vec[1][0] = r1.getDouble(0);
+	ar_vec[1][1] = r1.getDouble(1);
+	ar_vec[1][2] = r1.getDouble(2);
+	ar_vec[2][0] = r2.getDouble(0);
+	ar_vec[2][1] = r2.getDouble(1);
+	ar_vec[2][2] = r2.getDouble(2);
+
 	double[] ant = MatrixToQuatExp(ar_vec);
 	String pose_arr = "[["+r0.getDouble(3)+","+r1.getDouble(3)+","+r2.getDouble(3)+","+r3.getDouble(3)+"]"+
-	    "["+ant[0]+","+(ant[1] * -1)+","+(ant[2] * -1)+","+ant[3]+"]]";	   
+	    "["+ant[0]+","+(ant[1] * -1)+","+(ant[2] * -1)+","+ant[3]+"]]";     
+
 
 	ZMQ.close(sc);
 	ZMQ.term(ctx);
 	return pose_arr;
     }
-
-
 
     public String getTheType(String id)
     {
