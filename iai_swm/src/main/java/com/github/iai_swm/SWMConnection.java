@@ -626,7 +626,7 @@ public class SWMConnection{
     public boolean containsBBox1(String word)
     {
 
-	return(word.contains("bbox01") || word.contains("bbox1") || world.contains("bbx_river_point_min"));
+	return(word.contains("bbox01") || word.contains("bbox1") || word.contains("bbx_river_point_min"));
     }
 
     public boolean containsBoundingBox(String word)
