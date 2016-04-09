@@ -208,9 +208,10 @@ public class SWMConnection{
 	for(int i = 0; i < array.length; i++)
 	    {
 		
-		System.out.println("test "+array[i][1]);
+		System.out.println("test "+array[i][0]+" " +array[i][1]);
 		if(containsRiver(array[i][1]))
 		    {
+			System.out.println("test "+array[i][1]);
 			String tmp = getTheRiverList(array[i][0],array[i][1]);
 			river=river+tmp;
 		    }else
@@ -281,7 +282,7 @@ public class SWMConnection{
 
     public String getTheWoodList(String array1, String array2)
     { 
-	//System.out.println("Get the wood list");
+	System.out.println("Get the wood list");
 	Vector<String> childNds = new Vector<String>(1);
 	String name_vector= array2;
 	String type_vector = "wood"; //@TODO:getTheType(array1);
@@ -326,9 +327,10 @@ public class SWMConnection{
 
     public String getTheMountainList(String array1, String array2)
     { 
-	//	System.out.println("Get the mountain list");
+	System.out.println("Get the mountain list");
 	Vector<String> childNds = new Vector<String>(1);
 	String name_vector= array2;
+	System.out.println("type array2: " + getTheType(array1));
 	String type_vector = "mountain"; //@TODO:getTheType(array1);
 	childNds = getChildNodes(array1);
 	String[][] vec = new String[childNds.size()][2];
@@ -370,9 +372,11 @@ public class SWMConnection{
 
     public String getTheRiverList(String array1, String array2)
     { 
-	//	System.out.println("Get the river list");
+       	System.out.println("Get the river list");
 	Vector<String> childNds = new Vector<String>(1);
 	String name_vector= array2;
+	System.out.println("array2: " + array2);
+	System.out.println("type array2: " + getTheType(array1));
 	String type_vector = "river"; //@TODO:getTheType(array1);
 	childNds = getChildNodes(array1);
 	String[][] vec = new String[childNds.size()][2];
@@ -414,7 +418,7 @@ public class SWMConnection{
 
     public String recursiveBBoxx(String objname, String type, String arg1, String txt, int count)
     {
-	//	System.out.println("Inside RecursiveBBox");
+       	System.out.println("Inside RecursiveBBox");
 	Vector<String> childNds = new Vector<String>(1);
 	childNds = getChildNodes(arg1);
 	String[][] vec = new String[childNds.size()][2];
@@ -595,7 +599,7 @@ public class SWMConnection{
 
      public static boolean containsMountain( String text )
     {
-	return text.contains("mount");// || text.contains("center") 
+	return text.contains("mount")|| text.contains("mountain"); 
 	// || text.contains("bbox01") || text.contains("bbox02");
     }
 
@@ -607,7 +611,7 @@ public class SWMConnection{
 
    public static boolean containsWood( String text )
     {
-	return text.contains("wood");// || text.contains("center") 
+	return text.contains("wood") || text.contains("tree");// || text.contains("center") 
 	// || text.contains("bbox01") || text.contains("bbox02");
     }
 
@@ -871,6 +875,7 @@ public class SWMConnection{
 		msg = ZMQ.recv(sc, 0);
 		jsonObject = JSONObject.fromObject(new String(msg.data()));
 		JSONArray transform = jsonObject.getJSONArray("attributes");
+		System.out.println("transform :"+transform);
 		JSONObject home = transform.getJSONObject(0);
 		id_name[i][0] = vector.get(i);
 		id_name[i][1] = home.getString("value");
