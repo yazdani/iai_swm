@@ -78,8 +78,7 @@ public class SWMConnection{
 	
 	//System.out.println("received reply");
 	JSONObject jsonObject = JSONObject.fromObject(new String(msg.data()));
-	//System.out.println(jsonObject);
-	
+	//System.out.println(jsonObject);	
 	JSONArray array =  jsonObject.getJSONArray("ids");
 	ZMQ.close(sc);
 	ZMQ.term(ctx);
@@ -104,7 +103,7 @@ public class SWMConnection{
 	agents_trans = getAgentsTransform(agents_id, ref_id);
 	
  
-	return "(("+name+","+"type"+","+agents_trans+"))";
+	return "(("+name+","+"animal"+","+agents_trans+"))";
     }
 
     /*
@@ -154,13 +153,13 @@ public class SWMConnection{
 	ar_vec[2][0] = r2.getDouble(0);
 	ar_vec[2][1] = r2.getDouble(1);
 	ar_vec[2][2] = r2.getDouble(2);
-	System.out.println(r0.getDouble(0)+"   "+r0.getDouble(1)+"   "+"    "+r0.getDouble(2)+"    "+"         "+r1.getDouble(0)+"        "+"         "+r1.getDouble(1)+"     "+"      "+r1.getDouble(2)+"      "+"             "+r2.getDouble(0)+"         " +r2.getDouble(1)+"       "+"       "+r2.getDouble(2));
+	//System.out.println(r0.getDouble(0)+"   "+r0.getDouble(1)+"   "+"    "+r0.getDouble(2)+"    "+"         "+r1.getDouble(0)+"        "+"         "+r1.getDouble(1)+"     "+"      "+r1.getDouble(2)+"      "+"             "+r2.getDouble(0)+"         " +r2.getDouble(1)+"       "+"       "+r2.getDouble(2));
 
 
 
 	double[] ant = MatrixToQuatExp(ar_vec);
 
-	System.out.println(ant[0] + " und "+ant[1]+ " und " +ant[2]+ " und "+ant[3]);
+	//System.out.println(ant[0] + " und "+ant[1]+ " und " +ant[2]+ " und "+ant[3]);
 	String pose_arr = "[["+r0.getDouble(3)+","+r1.getDouble(3)+","+r2.getDouble(3)+","+r3.getDouble(3)+"]"+
 	    "["+ant[0]+","+(ant[1] * -1)+","+(ant[2] * -1)+","+ant[3]+"]]";
 
@@ -182,9 +181,11 @@ public class SWMConnection{
 	
 	String objref_id = getObjectsREFID();
 	//System.out.println("bist UNwwwwwDlll222");
-	String[][] array =getSelChildNodes(getChildNodes(objref_id));
+	String[][] array = getSelChildNodes(getChildNodes(objref_id));
 	String mount = "";
 	String environment= "";
+	String observation= "";
+	//System.out.println("array[0][0]: "+array[0][1]);
 	for(int i =0; i < array.length; i++)
 	    {
 		  if(containsEnvironment(array[i][1]))
@@ -192,11 +193,21 @@ public class SWMConnection{
 			    String tmp = getTheEnvironmentList(array[i][0]);
 			    environment = environment+tmp;
 			}
+		  //if(containsObservation(array[i][1]))
+		  //   {
+		  //	  String tmp = getTheObservationList(array[i][0]);
+		  //	  observation = observation+tmp;
+		  //    }
 	    }
 	return "("+environment+")";
 	
     }
 
+    //public String getTheObservationList(String array1)
+    //{
+    //	return array1;
+    //}
+    
     public String getTheEnvironmentList(String array1)
     {
 	String[][] array =getTheChildrens(getChildNodes(array1));
@@ -208,26 +219,26 @@ public class SWMConnection{
 	for(int i = 0; i < array.length; i++)
 	    {
 		
-		System.out.println("test "+array[i][0]+" " +array[i][1]);
+		//System.out.println("test "+array[i][0]+" " +array[i][1]);
 		if(containsRiver(array[i][1]))
 		    {
-			System.out.println("test "+array[i][1]);
-			String tmp = getTheRiverList(array[i][0],array[i][1]);
+			//System.out.println("test "+array[i][1]);
+			String tmp = getTheRiverList(array[i][0],array[i][1], array[i][2]);
 			river=river+tmp;
 		    }else
 		    if(containsMountain(array[i][1]))
 		    {
-			String tmp = getTheMountainList(array[i][0],array[i][1]);
+			String tmp = getTheMountainList(array[i][0],array[i][1],array[i][2]);
 			mount=mount+tmp;
 		    }else
 		    if(containsWood(array[i][1]))
 		    {
-			String tmp = getTheWoodList(array[i][0],array[i][1]);
+			String tmp = getTheWoodList(array[i][0],array[i][1],array[i][2]);
 			wood=wood+tmp;
 		    }else
 		    if(containsHouse(array[i][1]))
 		    {
-			String tmp = getTheHouseList(array[i][0],array[i][1]);
+			String tmp = getTheHouseList(array[i][0],array[i][1],array[i][2]);
 			house=house+tmp;
 		    }
 	    }
@@ -235,12 +246,21 @@ public class SWMConnection{
 
     }
 
-    public String getTheHouseList(String array1, String array2)
+    public String getTheHouseList(String array1, String array2, String array3)
     { 
 	//System.out.println("Get the house list");
 	Vector<String> childNds = new Vector<String>(1);
 	String name_vector= array2;
-	String type_vector = "house"; //@TODO:getTheType(array1);
+	String type_vector = "";
+	if(array3.equals(""))
+	    {
+		type_vector = getTheType(array1);//"house";
+	    }else
+	    {
+		type_vector = array3; 
+	    }
+
+	//String type_vector = array3; //"house"; //@TODO:getTheType(array1);
 	childNds = getChildNodes(array1);
 	String[][] vec = new String[childNds.size()][2];
 	vec = getTheChildrens(childNds);
@@ -280,12 +300,20 @@ public class SWMConnection{
 	return "Something went wrong inside House";
     }
 
-    public String getTheWoodList(String array1, String array2)
+    public String getTheWoodList(String array1, String array2, String array3)
     { 
-	System.out.println("Get the wood list");
+	//System.out.println("Get the wood list");
 	Vector<String> childNds = new Vector<String>(1);
 	String name_vector= array2;
-	String type_vector = "wood"; //@TODO:getTheType(array1);
+	String type_vector = "";
+	if(array3.equals(""))
+	    {
+		type_vector = getTheType(array1);//"wood";
+	    }else
+	    {
+		type_vector = array3; 
+	    }
+	//String type_vector = array3; //"wood"; //@TODO:getTheType(array1);
 	childNds = getChildNodes(array1);
 	String[][] vec = new String[childNds.size()][2];
 	vec = getTheChildrens(childNds);
@@ -325,13 +353,22 @@ public class SWMConnection{
 	return "Something went wrong inside Wood";
     }
 
-    public String getTheMountainList(String array1, String array2)
+    public String getTheMountainList(String array1, String array2, String array3)
     { 
-	System.out.println("Get the mountain list");
+	//System.out.println("Get the mountain list");
 	Vector<String> childNds = new Vector<String>(1);
 	String name_vector= array2;
-	System.out.println("type array2: " + getTheType(array1));
-	String type_vector = "mountain"; //@TODO:getTheType(array1);
+	String type_vector = "";
+	//	System.out.println("type array2: " + getTheType(array1));
+	if(array3.equals(""))
+	    {
+		type_vector = getTheType(array1);//"mountain";
+	    }else
+	    {
+		type_vector = array3; 
+	    }
+
+	//String type_vector = "mountain"; //@TODO:getTheType(array1);
 	childNds = getChildNodes(array1);
 	String[][] vec = new String[childNds.size()][2];
 	vec = getTheChildrens(childNds);
@@ -370,14 +407,22 @@ public class SWMConnection{
 	return "Something went wrong inside mountain";
     }
 
-    public String getTheRiverList(String array1, String array2)
+    public String getTheRiverList(String array1, String array2, String array3)
     { 
-       	System.out.println("Get the river list");
+       	//System.out.println("Get the river list");
 	Vector<String> childNds = new Vector<String>(1);
 	String name_vector= array2;
-	System.out.println("array2: " + array2);
-	System.out.println("type array2: " + getTheType(array1));
-	String type_vector = "river"; //@TODO:getTheType(array1);
+	String type_vector = "";
+	//System.out.println("array2: " + array2);
+	//System.out.println("type array2: " + getTheType(array1));
+	if(array3.equals(""))
+	    {
+		type_vector = getTheType(array1);
+	    }else
+	    {
+		type_vector = array3; 
+	    }
+	//String type_vector = array3; //"river"; //@TODO:getTheType(array1);
 	childNds = getChildNodes(array1);
 	String[][] vec = new String[childNds.size()][2];
 	vec = getTheChildrens(childNds);
@@ -418,7 +463,7 @@ public class SWMConnection{
 
     public String recursiveBBoxx(String objname, String type, String arg1, String txt, int count)
     {
-       	System.out.println("Inside RecursiveBBox");
+	//	System.out.println("Inside RecursiveBBox");
 	Vector<String> childNds = new Vector<String>(1);
 	childNds = getChildNodes(arg1);
 	String[][] vec = new String[childNds.size()][2];
@@ -718,6 +763,7 @@ public class SWMConnection{
 	jsonObject = JSONObject.fromObject(new String(msg.data()));
 	JSONArray transform =  jsonObject.getJSONArray("attributes");
 	JSONObject home = transform.getJSONObject(1);
+	//System.out.println("getString(value);: " +home.getString("value"));
 	id_ = home.getString("value");
 	ZMQ.close(sc);
 	ZMQ.term(ctx);
@@ -761,6 +807,7 @@ public class SWMConnection{
      **/
     public Vector<String> getChildNodes(String id)
     {
+	//System.out.println("getChildNodes");
 	ctx = ZMQ.init(1);                         
 	sc = ZMQ.socket(ctx, ZMQ.ZMQ_REQ);
 	String data;
@@ -789,25 +836,29 @@ public class SWMConnection{
 
     public String [][] getTheChildrens(Vector<String> vector)
     {
+	//System.out.println("getTheChildrens");
 	int index=0;
-	String[][] vector2 = new String[vector.size()][2];
-	vector2 = getIDANDName(vector);
+	String[][] vector2 = new String[vector.size()][3];
+	vector2 = getIDANDNameANDType(vector);
 	Vector<String> vec1 = new Vector<String>(2);
 	Vector<String> vec2 = new Vector<String>(2);
+	Vector<String> vec3 = new Vector<String>(2);
 	String[][] arrays2;
 	for(int i = 0;i < vector2.length;i++)
 	    {
 		vec1.addElement(vector2[i][0]);
 		vec2.addElement(vector2[i][1]);
-		
+		vec3.addElement(vector2[i][2]);
 	    }
-	arrays2 = new String[vec1.size()][2];
+	arrays2 = new String[vec1.size()][3];
 	while(vec1.size() > index)
 	    {
 		arrays2[index][0] = vec1.get(index);
 		arrays2[index][1] = vec2.get(index);
+		arrays2[index][2] = vec3.get(index);
 		index++;
 	    }
+
 	return arrays2;
     }
 
@@ -820,10 +871,12 @@ public class SWMConnection{
      **/
     public String[][] getSelChildNodes(Vector<String> vector)
     {
-	String[][] vector2 = new String[vector.size()][2];
-	vector2 = getIDANDName(vector);
+	//System.out.println("getSelChildNodes");
+	String[][] vector2 = new String[vector.size()][3];
+	vector2 = getIDANDNameANDType(vector);
 	Vector<String> vec1 = new Vector<String>(2);
 	Vector<String> vec2 = new Vector<String>(2);
+	Vector<String> vec3 = new Vector<String>(2);
 	String[][] arrays2;
 
 	int index = 0;
@@ -835,13 +888,15 @@ public class SWMConnection{
 		else{
 			vec1.addElement(vector2[i][0]);
 			vec2.addElement(vector2[i][1]);
+			vec3.addElement(vector2[i][2]);
 		}
 	    }
-	arrays2 = new String[vec1.size()][2];
+	arrays2 = new String[vec1.size()][3];
 	while(vec1.size() > index)
 	    {
 		arrays2[index][0] = vec1.get(index);
 		arrays2[index][1] = vec2.get(index);
+		arrays2[index][2] = vec3.get(index);
 		index++;
 	    }
 	return arrays2;
@@ -853,10 +908,10 @@ public class SWMConnection{
      *           inside the vector
      *
      **/
-    public String[][] getIDANDName(Vector<String> vector)
+    public String[][] getIDANDNameANDType(Vector<String> vector)
     {     
 	String data;
-	String[][] id_name = new String[vector.size()][2];
+	String[][] id_name = new String[vector.size()][3];
 	int result;
 	Msg msg;
 	JSONObject jsonObject;
@@ -875,10 +930,21 @@ public class SWMConnection{
 		msg = ZMQ.recv(sc, 0);
 		jsonObject = JSONObject.fromObject(new String(msg.data()));
 		JSONArray transform = jsonObject.getJSONArray("attributes");
-		System.out.println("transform :"+transform);
 		JSONObject home = transform.getJSONObject(0);
+		//System.out.println("home: "+home);
+		//System.out.println("home: "+home);
+		if(home.getString("key").equals("name"))
+		    {
+			id_name[i][1] = home.getString("value");
+			id_name[i][2] = "";
+		    }else
+		    {
+			id_name[i][1] =home.getString("value")+"_00";
+			id_name[i][2] = home.getString("value");
+		    }
+		//System.out.println("home.getString(value); :"+home.getString("value"));
 		id_name[i][0] = vector.get(i);
-		id_name[i][1] = home.getString("value");
+
 		ZMQ.close(sc);
 		ZMQ.term(ctx);
        	    }
